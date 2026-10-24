@@ -7,7 +7,7 @@ name = "doc-compose"
 version = "0.1.0"
 description = "Compose a final document from template A + content B: md-first pipeline, LLM filling, CN/EN/bilingual, docx/pdf output"
 requires-python = ">=3.10"
-dependencies = ["markitdown>=0.0.2", "openpyxl>=3.1"]
+dependencies = ["markitdown>=0.0.2", "openpyxl>=3.1", "reportlab>=4.0"]
 
 [project.scripts]
 doc-compose = "doccompose.cli:main"

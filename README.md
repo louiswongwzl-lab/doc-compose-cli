@@ -27,7 +27,7 @@ LLM 起草：B 的内容映射填入 A 的骨架
 ```bash
 pip install "doc-compose @ git+https://github.com/louiswongwzl-lab/doc-compose-cli@main"
 ```
-依赖自动带上（markitdown、openpyxl）。Python ≥ 3.10。
+依赖自动带上（markitdown、openpyxl、reportlab）。Python ≥ 3.10。
 
 ## 配置（每个使用者自己配一次）
 
@@ -73,6 +73,16 @@ doc-compose A.docx B.pdf --out-file 交付/周报-final.docx      # 指定输出
 ```
 
 中间件（各 md、草稿、双语稿）在 `./doc-compose-work/`，交付后可删。
+
+```bash
+doc-compose A.docx --final-md 我写好的稿件.md --out docx   # 跳过 LLM 与确认，直接用既有稿件生成输出
+```
+
+## PDF 输出三重兑底（按顺序自动尝试）
+
+1. pandoc + LaTeX 引擎（最美观，需另装 LaTeX）
+2. Chromium 系浏览器（Edge/Chrome）无头打印 HTML
+3. **reportlab 纯 Python 渲染**（内置中文字体，无系统依赖；本机浏览器被锁时的实际走法）
 
 ## 硬规则（与 skill 一致）
 

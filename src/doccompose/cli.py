@@ -58,6 +58,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--out-file", help="输出文件路径（默认：<模板A主名>-final.<扩展名>，在当前目录）")
     ap.add_argument("--workdir", default="doc-compose-work", help="中间件目录（默认 ./doc-compose-work）")
     ap.add_argument("--yes", action="store_true", help="跳过草稿确认，直接输出")
+    ap.add_argument("--final-md", help="跳过 LLM 与确认，直接用该 markdown 文件生成输出（测试/已有稿件用）")
     ap.add_argument("--only-convert", action="store_true", help="只做格式转换，不调用 LLM")
     ap.add_argument("--version", action="version", version=f"doc-compose {__version__}")
     args = ap.parse_args(argv)
@@ -77,6 +78,21 @@ def main(argv: list[str] | None = None) -> int:
         _print_skeleton(a_md)
         if args.only_convert:
             print("完成（--only-convert）。")
+            return 0
+
+        if args.final_md:
+            final_md = Path(args.final_md)
+            if not final_md.exists():
+                raise SystemExit(f"错误：--final-md 文件不存在：{final_md}")
+            fmt = (args.out or "docx").lower().strip(".")
+            if fmt not in {"md", "docx", "pdf", "html"}:
+                raise SystemExit(f"错误：暂不支持的输出格式 {fmt}（md/docx/pdf/html）")
+            print(f"[2/5] 使用既有稿件（--final-md），跳过 LLM 起草与确认：{final_md.name}")
+            stem = a_src.stem
+            out_path = Path(args.out_file) if args.out_file else Path(f"{stem}-final-{fmt}.{fmt}")
+            final = output.write_final(final_md, fmt, out_path)
+            print(f"[5/5] 完成：{final}（{final.stat().st_size//1024}KB）")
+            print(f"草稿/中间件目录：{workdir}/（可删除）")
             return 0
 
         print("[2/5] 输出选项")
